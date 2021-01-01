@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace Snacks.Entity.Authorization
 {
-    public abstract class BaseEntitySecurityHandler<TModel> : AuthorizationHandler<IEntitySecurityRequirement<TModel>>
+    public abstract class BaseEntitySecurityHandler<TModel, TRequirement> : AuthorizationHandler<TRequirement>
         where TModel : IEntityModel
+        where TRequirement : IEntitySecurityRequirement<TModel>
     {
         protected readonly IHttpContextAccessor _httpContextAccessor;
         public BaseEntitySecurityHandler(
@@ -18,7 +19,7 @@ namespace Snacks.Entity.Authorization
             _httpContextAccessor = httpContextAccessor;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IEntitySecurityRequirement<TModel> requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, TRequirement requirement)
         {
             HttpContext httpContext = _httpContextAccessor.HttpContext;
 
