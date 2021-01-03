@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Snacks.Entity.Authorization.Attributes;
-using Snacks.Entity.Core.Entity;
+using Snacks.Entity.Core;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;

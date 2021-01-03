@@ -1,7 +1,4 @@
-﻿using Snacks.Entity.Core.Entity;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Snacks.Entity.Core;
 
 namespace Snacks.Entity.Authorization
 {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Snacks.Entity.Core.Entity;
+using Snacks.Entity.Core;
 
 namespace Snacks.Entity.Authorization
 {
