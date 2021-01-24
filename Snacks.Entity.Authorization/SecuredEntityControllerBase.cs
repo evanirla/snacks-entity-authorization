@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Snacks.Entity.Authorization
 {
-    public abstract class SecuredEntityControllerBase<TEntity> : EntityControllerBase<TEntity>
+    public abstract class SecuredEntityControllerBase<TEntity, TKey> : EntityControllerBase<TEntity, TKey>
         where TEntity : class
     {
         protected readonly IAuthorizationService _authorizationService;
@@ -41,7 +41,7 @@ namespace Snacks.Entity.Authorization
             return result;
         }
 
-        public override async Task<ActionResult<TEntity>> GetAsync([FromRoute] object id)
+        public override async Task<ActionResult<TEntity>> GetAsync([FromRoute] TKey id)
         {
             ActionResult<TEntity> result = await base.GetAsync(id);
 
@@ -81,7 +81,7 @@ namespace Snacks.Entity.Authorization
             return result;
         }
 
-        public override async Task<IActionResult> PatchAsync([FromRoute] object id, [FromBody] object data)
+        public override async Task<IActionResult> PatchAsync([FromRoute] TKey id, [FromBody] object data)
         {
             TEntity entity = await Service.FindAsync(id);
 
@@ -96,7 +96,7 @@ namespace Snacks.Entity.Authorization
             return await base.PatchAsync(id, data);
         }
 
-        public override async Task<IActionResult> DeleteAsync([FromRoute] object id)
+        public override async Task<IActionResult> DeleteAsync([FromRoute] TKey id)
         {
             TEntity entity = await Service.FindAsync(id);
 
@@ -112,7 +112,7 @@ namespace Snacks.Entity.Authorization
         }
     }
 
-    public abstract class SecuredEntityControllerBase<TEntity, TEntityService> : SecuredEntityControllerBase<TEntity>
+    public abstract class SecuredEntityControllerBase<TEntity, TKey, TEntityService> : SecuredEntityControllerBase<TEntity, TKey>
         where TEntity : class
         where TEntityService : IEntityService<TEntity>
     {
