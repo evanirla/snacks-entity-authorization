@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Snacks.Entity.Core;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,7 +14,8 @@ namespace Snacks.Entity.Authorization
 
         public SecuredEntityControllerBase(
             IEntityService<TEntity> entityService,
-            IAuthorizationService authorizationService) : base(entityService)
+            IAuthorizationService authorizationService,
+            IDistributedCache distributedCache = null) : base(entityService, distributedCache)
         {
             _authorizationService = authorizationService;
         }
@@ -120,7 +122,8 @@ namespace Snacks.Entity.Authorization
 
         public SecuredEntityControllerBase(
             TEntityService entityService,
-            IAuthorizationService authorizationService) : base(entityService, authorizationService)
+            IAuthorizationService authorizationService,
+            IDistributedCache distributedCache = null) : base(entityService, authorizationService, distributedCache)
         {
             
         }
