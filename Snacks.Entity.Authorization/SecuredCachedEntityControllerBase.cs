@@ -1,21 +1,30 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using Snacks.Entity.Caching;
 using Snacks.Entity.Core;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Snacks.Entity.Authorization
 {
-    public abstract class SecuredEntityControllerBase<TEntity, TKey> : EntityControllerBase<TEntity, TKey>
+    public class SecuredCachedEntityControllerBase<TEntity, TKey> : CachedEntityControllerBase<TEntity, TKey>
         where TEntity : class
     {
         protected readonly IAuthorizationService _authorizationService;
+        private readonly SecuredGlobalCacheService<TEntity> _securedGlobalCache;
 
-        public SecuredEntityControllerBase(
+        protected override IEntityCacheService<TEntity> GlobalCache => _securedGlobalCache;
+
+        public SecuredCachedEntityControllerBase(
             IEntityService<TEntity> entityService,
-            IAuthorizationService authorizationService) : base(entityService)
+            IDistributedCache distributedCache,
+            IHttpContextAccessor httpContextAccessor,
+            IAuthorizationService authorizationService) : base(entityService, distributedCache, httpContextAccessor)
         {
             _authorizationService = authorizationService;
+            _securedGlobalCache = new SecuredGlobalCacheService<TEntity>(distributedCache, httpContextAccessor, authorizationService);
         }
 
         public override async Task<ActionResult<IList<TEntity>>> GetAsync()
@@ -29,7 +38,7 @@ namespace Snacks.Entity.Authorization
 
             foreach (TEntity entity in result.Value)
             {
-                AuthorizationResult authorizationResult = 
+                AuthorizationResult authorizationResult =
                     await _authorizationService.AuthorizeAsync(User, entity, Operations.Read);
 
                 if (!authorizationResult.Succeeded)
@@ -112,17 +121,19 @@ namespace Snacks.Entity.Authorization
         }
     }
 
-    public abstract class SecuredEntityControllerBase<TEntity, TKey, TEntityService> : SecuredEntityControllerBase<TEntity, TKey>, IEntityController<TEntity, TKey, TEntityService>
+    public abstract class SecuredCachedEntityControllerBase<TEntity, TKey, TEntityService> : SecuredCachedEntityControllerBase<TEntity, TKey>, IEntityController<TEntity, TKey, TEntityService>
         where TEntity : class
         where TEntityService : IEntityService<TEntity>
     {
         new protected TEntityService Service => (TEntityService)base.Service;
 
-        public SecuredEntityControllerBase(
+        public SecuredCachedEntityControllerBase(
             TEntityService entityService,
-            IAuthorizationService authorizationService) : base(entityService, authorizationService)
+            IDistributedCache distributedCache,
+            IHttpContextAccessor httpContextAccessor,
+            IAuthorizationService authorizationService) : base(entityService, distributedCache, httpContextAccessor, authorizationService)
         {
-            
+
         }
     }
 }
